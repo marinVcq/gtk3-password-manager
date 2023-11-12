@@ -11,6 +11,7 @@
 G_DECLARE_FINAL_TYPE(LoginWindow, login_window, LOGIN, WINDOW, GtkApplicationWindow);
 
 LoginWindow *login_window_new(MyApp *app);
-static void on_login_window_dispose(GObject *object);
+void on_login_window_dispose(GObject *object);
+void on_login_button_clicked(GtkButton *button, LoginWindow *login_win);
 
 #endif // LOGINWINDOW_H
