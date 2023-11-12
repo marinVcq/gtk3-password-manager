@@ -11,6 +11,7 @@
 G_DECLARE_FINAL_TYPE(AuthenticatedWindow, authenticated_window, AUTHENTICATED, WINDOW, GtkApplicationWindow)
 
 AuthenticatedWindow *authenticated_window_new(MyApp *app);
+void logout_button_clicked(GtkButton *button, AuthState *auth_state);
 
 #endif /* AUTHENTICATEDWINDOW_H */
 
