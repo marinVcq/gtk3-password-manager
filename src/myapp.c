@@ -15,14 +15,19 @@ void my_app_activate(GApplication *app) {
 
 void my_app_startup(GApplication *app){
 
-	g_print("Startup signal received.\n");
+	g_print("Startup signal received from myapp.c\n");
 	AuthState *auth_state = &MY_APP(app)->auth_state;
 	auth_state->authenticated = FALSE;
 
 	G_APPLICATION_CLASS(my_app_parent_class)->startup(app);
+	
+	
+	app->login_window = login_window_new(my_app);
+	gtk_widget_show_all(GTK_WIDGET(my_app->login_window));
 
-	LoginWindow *login_win = login_window_new(MY_APP(app));
-	gtk_widget_show_all(GTK_WIDGET(login_win));
+	app->authenticated_window = authenticated_window_new(my_app);
+	/* Hide authenticated first */
+	gtk_widget_hide(GTK_WIDGET(my_app->authenticated_window));
 	
 	/* Initialize database */
 	init_database(&MY_APP(app)->db_manager);
@@ -37,7 +42,7 @@ static void my_app_init(MyApp *app) {
 
 	/* Initialize database */
 	init_database(&MY_APP(app)->db_manager);
-	}
+}
 
 MyApp *my_app_new(void) {
 	return g_object_new(MY_APP_TYPE, "application-id", "org.gtk.myapp", NULL);

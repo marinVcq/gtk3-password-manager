@@ -5,6 +5,7 @@
 #include "../include/loginwindow.h"
 #include "../include/authenticatedwindow.h"
 
+
 int main(int argc, char *argv[]) {
     /* Initialize GTK */
     gtk_init(&argc, &argv);

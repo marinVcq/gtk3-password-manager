@@ -6,6 +6,9 @@
 #include <gtk/gtk.h>
 #include <sqlite3.h>
 
+#include "loginwindow.h"
+#include "authenticatedwindow.h"
+
 #define MY_APP_TYPE (my_app_get_type())
 
 /* Structure to store database */
@@ -21,9 +24,11 @@ typedef struct _AuthState{
 
 /* Structure to represent the MyApp instance */
 typedef struct _MyApp {
-    GtkApplication parent;
-    AuthState auth_state;
-    DBManager db_manager;
+	GtkApplication parent;
+	LoginWindow *login_window;
+	AuthenticatedWindow *authenticated_window;
+	AuthState auth_state;
+	DBManager db_manager;
 } MyApp;
 
 

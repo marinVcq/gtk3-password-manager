@@ -17,7 +17,7 @@ void on_login_button_clicked(GtkButton *button, AuthState *auth_state) {
     g_print("login button clicked!");
 
     // Get the application instance
-    MyApp *app = MY_APP(g_application_get_default());
+    MyApp *my_app = MY_APP(g_application_get_default());
 
     // Access the login window
     GtkWidget *login_window = GTK_WIDGET(gtk_widget_get_ancestor(GTK_WIDGET(button), GTK_TYPE_APPLICATION_WINDOW));
@@ -25,11 +25,9 @@ void on_login_button_clicked(GtkButton *button, AuthState *auth_state) {
     // Hide the login window
     gtk_widget_hide(login_window);
 
-    // Create and show the authenticated window
-    AuthenticatedWindow *auth_win = authenticated_window_new(app);
-    gtk_widget_show_all(GTK_WIDGET(auth_win));
+    // Show the authenticated window
+    gtk_widget_show_all(GTK_WIDGET(my_app->authenticated_window));
 }
-
 
 
 static void login_window_init(LoginWindow *win) {
@@ -99,7 +97,6 @@ LoginWindow *login_window_new(MyApp *app){
 
 	// Access AuthState from the MyApp instance
 	AuthState *auth_state = &app->auth_state;
-
 	return g_object_new(LOGIN_WINDOW_TYPE, "application", app,NULL);
 
 }
