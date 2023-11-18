@@ -1,11 +1,19 @@
 #include <gtk/gtk.h>
 #include "login.h"
 
-void on_login_button_clicked(GtkButton *button, gpointer data) {
-    GtkWidget *stack = GTK_WIDGET(data); // Change GtkStack to GtkWidget
-    // Assuming your authentication logic here
-    // For simplicity, let's just switch to the main page for any click on the login button
-    gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
+void on_login_button_clicked(GtkButton *button, gpointer data) 
+{
+	GtkWidget *stack = GTK_WIDGET(data);
+
+	/* Auth logic here soon */
+	
+	gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
+}
+
+void create_user_page_button_clicked(GtkButton *button, gpointer data)
+{
+	GtkWidget *stack = GTK_WIDGET(data);
+	gtk_stack_set_visible_child_name(GTK_STACK(stack), "create_user");
 }
 
 void login_init(GtkWidget *stack) { // Change GtkStack to GtkWidget
@@ -23,9 +31,15 @@ void login_init(GtkWidget *stack) { // Change GtkStack to GtkWidget
 	GtkWidget *label_password = gtk_label_new("Password:");
 	GtkWidget *entry_password = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(entry_password), FALSE); /* Hide the password */
-
+	
+	/* Login button */
 	GtkWidget *login_button = gtk_button_new_with_label("Login");
 	g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), stack);
+	
+	/* Go create user page */
+	GtkWidget *create_user_button = gtk_button_new_with_label("No account ?");
+	g_signal_connect(create_user_button, "clicked", G_CALLBACK(create_user_page_button_clicked), stack);
+	
 
 	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 2, 1);
 	gtk_grid_attach(GTK_GRID(grid), label_username, 0, 1, 1, 1);
@@ -33,7 +47,8 @@ void login_init(GtkWidget *stack) { // Change GtkStack to GtkWidget
 	gtk_grid_attach(GTK_GRID(grid), label_password, 0, 2, 1, 1);
 	gtk_grid_attach(GTK_GRID(grid), entry_password, 1, 2, 1, 1);
 	gtk_grid_attach(GTK_GRID(grid), login_button, 1, 3, 1, 1);
-
+	gtk_grid_attach(GTK_GRID(grid), create_user_button, 0, 4, 2, 1);
+	
 	// Pack the grid into the center of the vbox
 	gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
 

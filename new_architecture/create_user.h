@@ -1,11 +1,10 @@
 /* create_user.h */
 #ifndef CREATE_USER_H
-#define LOGIN_H
+#define CREATE_USER_H
 
 #include <gtk/gtk.h>
 
-void on_login_button_clicked(GtkButton *button, gpointer data);
-void login_init(GtkWidget *stack); // Change GtkStack to GtkWidget
+void create_user_init(GtkWidget *stack);
+void on_create_user_button_clicked(GtkButton *button, gpointer data);
 
-#endif // LOGIN_H
-
+#endif
