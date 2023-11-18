@@ -22,11 +22,11 @@ void my_app_startup(GApplication *app){
 	G_APPLICATION_CLASS(my_app_parent_class)->startup(app);
 	
 	
-	app->login_window = login_window_new(my_app);
+	my_app->login_window = login_window_new(my_app);
 	gtk_widget_show_all(GTK_WIDGET(my_app->login_window));
 
-	app->authenticated_window = authenticated_window_new(my_app);
-	/* Hide authenticated first */
+	my_app->authenticated_window = authenticated_window_new(my_app);
+	/* Hide authenticated first*/""
 	gtk_widget_hide(GTK_WIDGET(my_app->authenticated_window));
 	
 	/* Initialize database */
