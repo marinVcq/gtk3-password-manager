@@ -10,6 +10,7 @@ int initialize_database(const char *database_name);
 int create_tables(sqlite3 *db);
 bool check_user(const char *username);
 bool check_password(const char *username, const char *password);
+bool insert_user(const char *username, const char *email, const char *password);
 
 #endif // DATABASE_H
 

@@ -12,7 +12,7 @@ typedef struct {
 	GtkWidget *stack;
 } LoginPage;
 
-/* Declare the loginPage */ 
+/* Declare the login_page */ 
 extern LoginPage login_page;
 
 void on_login_button_clicked(GtkButton *button, gpointer data);

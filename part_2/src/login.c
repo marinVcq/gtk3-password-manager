@@ -15,19 +15,19 @@ void on_login_button_clicked(GtkButton *button, gpointer data) {
     GtkWidget *stack = login_page.stack;
     GtkWidget *error_label = login_page.error_label;
 
-    // Check if the user exists
+    /* Check if user exists */
     if (check_user(username)) {
-        // Check if the password is correct
+        /* Check if the password is correct */
         if (check_password(username, password)) {
-            // Authentication successful
+	    /* display correct child if success */
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
             gtk_label_set_text(GTK_LABEL(error_label), "");  // Clear error message
         } else {
-            // Incorrect password
+            /* Handle incorrect password */
             gtk_label_set_text(GTK_LABEL(error_label), "Incorrect password");
         }
     } else {
-        // User does not exist
+        /* User not exists */
         gtk_label_set_text(GTK_LABEL(error_label), "User does not exist");
     }
 }
@@ -60,7 +60,7 @@ void login_init(GtkWidget *stack) {
 	GtkWidget *label_password = gtk_label_new("Password:");
 	login_page.entry_password = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(login_page.entry_password), FALSE); /* Hide the password */
-	login_page.error_label = gtk_label_new("This is an error");
+	login_page.error_label = gtk_label_new("");
 	
 	/* Login button connected to callback function */
 	GtkWidget *login_button = gtk_button_new_with_label("Login");
