@@ -1,5 +1,7 @@
+/* database.c */
 #include "../include/database.h"
 
+/* Function to initialize database */
 int initialize_database(const char *database_name) {
     sqlite3 *db;
     int rc = sqlite3_open(database_name, &db);
@@ -17,6 +19,19 @@ int initialize_database(const char *database_name) {
     return rc;
 }
 
+/* Function to check if user exist in database */
+bool check_user(const char *username){
+	/* Not implemented yet */
+	return true;
+}
+
+/* Function to check if password is correct */
+bool check_password(const char *username, const char *password){
+	/* Not implemented yet */
+	return true;
+}
+
+/* Function to create table users and passwords */
 int create_tables(sqlite3 *db) {
     const char *users_table = "CREATE TABLE IF NOT EXISTS users ("
                               "user_id INTEGER PRIMARY KEY AUTOINCREMENT,"

@@ -1,5 +1,7 @@
 /* create_user.c */
+#include <stdbool.h>
 #include "../include/create_user.h"
+#include "../include/database.h"
 
 void on_create_user_button_clicked(GtkButton *button, gpointer data)
 {

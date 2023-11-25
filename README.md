@@ -30,7 +30,7 @@ Finally the **part 3** is the heart of the application, include all database imp
 
 ### 1.2 Page Initialization
 
-For example take a look of `login.c`, the logic remain the same for every page
+For example take a look on `login.c`, the logic remain the same for every page
 
 - `void login_init(GtkWidget *stack)` This function called in `main.c` intialize the login page and will contain more complex design later (see **part 2**).
 - Connect button to `void on_login_button_clicked(GtkButton *button, gpointer data)` This is the callback function containing the auth logic and if success set visible the child of the stack with the name 'main'.
