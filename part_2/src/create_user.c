@@ -33,6 +33,10 @@ void on_create_user_button_clicked(GtkButton *button, gpointer data)
 		
 		/* Handle success */ 
 		g_print("Add user to database\n");
+		
+		/* Go to login page & clear error message */
+		gtk_stack_set_visible_child_name(GTK_STACK(stack), "login");
+		gtk_label_set_text(GTK_LABEL(error_label), "");
 
 	}else{
 		/* Handle error */
@@ -42,6 +46,9 @@ void on_create_user_button_clicked(GtkButton *button, gpointer data)
 
 /* Initialization of register page */
 void create_user_init(GtkWidget *stack) { // Change GtkStack to GtkWidget
+
+	/* Init the RegisterPage structure */
+	register_page.stack = stack;
 
 	/* Create a box container */
 	GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -67,7 +74,7 @@ void create_user_init(GtkWidget *stack) { // Change GtkStack to GtkWidget
 	
 	/* Create and connect button to callback function */
 	GtkWidget *create_user_button = gtk_button_new_with_label("Create User");
-	g_signal_connect(create_user_button, "clicked", G_CALLBACK(on_create_user_button_clicked), stack);
+	g_signal_connect(create_user_button, "clicked", G_CALLBACK(on_create_user_button_clicked), NULL);
 	
 	/* Attach widget to grid */
 	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 2, 1);

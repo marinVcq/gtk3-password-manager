@@ -19,9 +19,9 @@ void on_login_button_clicked(GtkButton *button, gpointer data) {
     if (check_user(username)) {
         /* Check if the password is correct */
         if (check_password(username, password)) {
-	    /* display correct child if success */
+	    /* display correct child if success & clear error message */
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
-            gtk_label_set_text(GTK_LABEL(error_label), "");  // Clear error message
+            gtk_label_set_text(GTK_LABEL(error_label), "");
         } else {
             /* Handle incorrect password */
             gtk_label_set_text(GTK_LABEL(error_label), "Incorrect password");

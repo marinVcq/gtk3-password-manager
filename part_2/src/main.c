@@ -3,6 +3,7 @@
 #include "../include/create_user.h"
 #include "../include/login.h"
 #include "../include/mainwindow.h"
+#include "../include/add_password.h"
 
 int main(int argc, char *argv[]) {
 
@@ -10,8 +11,7 @@ int main(int argc, char *argv[]) {
 	gtk_init(&argc, &argv);
 
 	/* Initialize the database */ 
-	const char *database_name = "password_manager.db";
-	int db_init_result = initialize_database(database_name);
+	int db_init_result = initialize_database();
 
 	if (db_init_result != SQLITE_OK) {
 	fprintf(stderr, "Error initializing the database.\n");
@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 	login_init(stack);
 	create_user_init(stack);
 	mainwindow_init(stack);
+	add_password_init(stack);
 
 	/* Show the main window && start the App */
 	gtk_widget_show_all(window);
