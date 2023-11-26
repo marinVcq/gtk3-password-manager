@@ -1,6 +1,7 @@
 /* mainwindow.c */
 #include <gtk/gtk.h>
 #include "../include/mainwindow.h"
+#include "../include/database.h"
 
 MainPage main_page;
 
@@ -16,11 +17,39 @@ void on_add_button_clicked(GtkButton *button, gpointer data) {
 	gtk_stack_set_visible_child_name(GTK_STACK(stack), "add_password");
 }
 
+/* Test function to get all passwords */
+void display_passwords(PasswordInfo *passwords, int num_passwords) {
+    for (int i = 0; i < num_passwords; i++) {
+        printf("Password ID: %d\n", passwords[i].password_id);
+        printf("Username: %s\n", passwords[i].username);
+        printf("Email: %s\n", passwords[i].email);
+        printf("Service Name: %s\n", passwords[i].service_name);
+        printf("Service Link: %s\n", passwords[i].service_link);
+        printf("Password: %s\n", passwords[i].password);
+        printf("Creation Date: %s\n", passwords[i].creation_date);
+        printf("Update Date: %s\n", passwords[i].update_date);
+        printf("User ID: %d\n", passwords[i].user_id);
+        printf("------------------------\n");
+    }
+}
+
 /* Initialize the main application page */
 void mainwindow_init(GtkWidget *stack) {
 
 	/* Init the MainPage structure */
 	main_page.stack = stack;
+	int num_passwords;
+    	PasswordInfo *passwords = fetch_passwords(&num_passwords);
+	
+	if (passwords) {
+		// Display passwords
+		display_passwords(passwords, num_passwords);
+
+		// Free the allocated memory
+		free(passwords);
+	} else {
+		fprintf(stderr, "Failed to fetch passwords\n");
+	}
 
 	GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	
