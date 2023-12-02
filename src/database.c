@@ -20,7 +20,7 @@ int initialize_database() {
 }
 
 /* Function to fetch passwords from the database */
-PasswordInfo* fetch_passwords(int* num_passwords) {
+PasswordInfo *fetch_all_passwords() {
     sqlite3 *db;
     int rc = sqlite3_open(DATABASE_NAME, &db);
 
@@ -30,10 +30,10 @@ PasswordInfo* fetch_passwords(int* num_passwords) {
         return NULL;
     }
 
-    const char *select_passwords_sql = "SELECT * FROM passwords;";
+    const char *fetch_passwords_sql = "SELECT * FROM passwords;";
     sqlite3_stmt *stmt;
 
-    rc = sqlite3_prepare_v2(db, select_passwords_sql, -1, &stmt, 0);
+    rc = sqlite3_prepare_v2(db, fetch_passwords_sql, -1, &stmt, 0);
 
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error (prepare statement): %s\n", sqlite3_errmsg(db));
@@ -41,47 +41,63 @@ PasswordInfo* fetch_passwords(int* num_passwords) {
         return NULL;
     }
 
-    /* Count number of passwords */
-    int count = 0;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        count++;
+    int result_count = 0;
+    PasswordInfo *passwords = NULL;
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        result_count++;
+        passwords = realloc(passwords, result_count * sizeof(PasswordInfo));
+
+        passwords[result_count - 1].password_id = sqlite3_column_int(stmt, 0);
+        passwords[result_count - 1].username = strdup((const char *)sqlite3_column_text(stmt, 1));
+        passwords[result_count - 1].email = strdup((const char *)sqlite3_column_text(stmt, 2));
+        passwords[result_count - 1].service_name = strdup((const char *)sqlite3_column_text(stmt, 3));
+        passwords[result_count - 1].service_link = strdup((const char *)sqlite3_column_text(stmt, 4));
+        passwords[result_count - 1].password = strdup((const char *)sqlite3_column_text(stmt, 5));
+        passwords[result_count - 1].creation_date = strdup((const char *)sqlite3_column_text(stmt, 6));
+        passwords[result_count - 1].update_date = strdup((const char *)sqlite3_column_text(stmt, 7));
+        passwords[result_count - 1].user_id = sqlite3_column_int(stmt, 8);
     }
 
-    /* Reset statement */
-    sqlite3_reset(stmt);
-
-    /* Allocate memory */
-    PasswordInfo *passwords = malloc(count * sizeof(PasswordInfo));
-    if (!passwords) {
-        fprintf(stderr, "Memory allocation error\n");
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        return NULL;
-    }
-
-    /* Fetch passwords */ 
-    int i = 0;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        passwords[i].password_id = sqlite3_column_int(stmt, 0);
-        passwords[i].username = (const char *)sqlite3_column_text(stmt, 1);
-        passwords[i].email = (const char *)sqlite3_column_text(stmt, 2);
-        passwords[i].service_name = (const char *)sqlite3_column_text(stmt, 3);
-        passwords[i].service_link = (const char *)sqlite3_column_text(stmt, 4);
-        passwords[i].password = (const char *)sqlite3_column_text(stmt, 5);
-        passwords[i].creation_date = (const char *)sqlite3_column_text(stmt, 6);
-        passwords[i].update_date = (const char *)sqlite3_column_text(stmt, 7);
-        passwords[i].user_id = sqlite3_column_int(stmt, 8);
-        i++;
-    }
-
-    /* Set number of password */
-    *num_passwords = count;
-
-    /* Close db after Finalize */ 
+    /* Finalize statement and close database */
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
     return passwords;
+}
+
+/* Function to get the result count */
+int get_result_count() {
+    int result_count = 0;
+    sqlite3 *db;
+    int rc = sqlite3_open(DATABASE_NAME, &db);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return result_count;
+    }
+
+    const char *count_passwords_sql = "SELECT COUNT(*) FROM passwords;";
+    sqlite3_stmt *stmt;
+
+    rc = sqlite3_prepare_v2(db, count_passwords_sql, -1, &stmt, 0);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error (prepare statement): %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return result_count;
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        result_count = sqlite3_column_int(stmt, 0);
+    }
+
+    /* Finalize statement and close database */
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return result_count;
 }
 
 /* Function to insert password in the database */

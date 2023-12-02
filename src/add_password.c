@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "../include/add_password.h"
 #include "../include/database.h"
+#include "../include/mainwindow.h"
 
 /* Declare instance of add password page */
 AddPasswordPage add_password_page;
@@ -36,6 +37,7 @@ void on_add_password_button_clicked(GtkButton *button, gpointer data)
 		/* Handle success */ 
 		g_print("Add password to database\n");
 		
+
 		/* Go to login page & clear error message */
 		gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
 		gtk_label_set_text(GTK_LABEL(error_label), "");
