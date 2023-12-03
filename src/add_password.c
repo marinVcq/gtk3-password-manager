@@ -37,8 +37,11 @@ void on_add_password_button_clicked(GtkButton *button, gpointer data)
 		/* Handle success */ 
 		g_print("Add password to database\n");
 		
+		// Update the password list
+		update_passwords_list(main_page.list_box);
+		
 
-		/* Go to login page & clear error message */
+		/* Go to main page & clear error message */
 		gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
 		gtk_label_set_text(GTK_LABEL(error_label), "");
 

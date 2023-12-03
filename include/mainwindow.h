@@ -9,6 +9,8 @@
 typedef struct {
 	GtkWidget *stack;
 	GtkWidget *list_box;
+	GtkWidget *search_entry;
+	PasswordInfo *passwords;
 } MainPage;
 
 extern MainPage main_page;
@@ -19,7 +21,10 @@ void on_add_button_clicked(GtkButton *button, gpointer data);
 void mainwindow_init(GtkWidget *stack);
 GtkWidget *create_header_row();
 void display_passwords_in_terminal(PasswordInfo *passwords, int num_passwords);
-void populate_passwords_list(GtkWidget *list_box);     
+void populate_passwords_list(GtkWidget *list_box);   
+void update_passwords_list(GtkWidget *list_box);  
+GtkWidget *create_password_box(const PasswordInfo *password);
+void add_header_row(GtkWidget *list_box);
 
 
 #endif // MAINWINDOW_H

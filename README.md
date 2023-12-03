@@ -1,5 +1,15 @@
 # Password Manager with GTK3 and C programming
 
+## TODO
+
+- Header row issue when user add pasword
+- Make list box scrollable
+- Encrypt user password and password records
+- Export Feature
+- Sorting feature
+- Back button on create account page
+- Design List Box
+
 ## Introduction
 
 Welcome! The purpose of this repo is to create a basic password manager using GTK3 library and C programming. I separate the process in 3 parts for a better understanding of my workflow and each part will guide you through the process of how to build a functional application with C programming without any framework.This project is designed to run on Debian-based operating systems.
