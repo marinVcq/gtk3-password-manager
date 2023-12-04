@@ -1,6 +1,8 @@
 /* mainwindow.c */
 #include <gtk/gtk.h>
+#include <stdio.h>
 #include "../include/mainwindow.h"
+#include <pango/pangocairo.h>
 
 MainPage main_page;
 
@@ -26,125 +28,177 @@ void on_export_button_clicked(GtkButton *button, gpointer data) {
 	/* Not implemented yet */ 
 }
 
+/* Function to update and populate the list box with passwords */
+void update_and_populate_passwords_list(GtkWidget *list_box) {
+	
+	/* Fetch paswords from database */
+	PasswordInfo *passwords = fetch_all_passwords();
 
-/* Function to update the list box with passwords */
-void update_passwords_list(GtkWidget *list_box) {
-    // Fetch all passwords from the database
-    PasswordInfo *passwords = fetch_all_passwords();
-    printf("update passwords function called\n");
+	if (passwords == NULL) {
+	fprintf(stderr, "Error fetching passwords from the database.\n");
+	return;
+	}
 
-    // Clear existing rows in the list box
-    GList *children, *iter;
-    children = gtk_container_get_children(GTK_CONTAINER(list_box));
-    for (iter = children; iter != NULL; iter = g_list_next(iter)) {
-        gtk_widget_destroy(GTK_WIDGET(iter->data));
-    }
-    g_list_free(children);
+	printf("update and populate passwords function called\n");
 
-    int result_count = get_result_count();
-    printf("Result count updated: %d  \n", result_count);
-    
-    // Add the header row to the list box
-    GtkWidget *header_row = create_header_row();
-    gtk_container_add(GTK_CONTAINER(list_box), header_row);
+	/* Clear existing rows */
+	GList *children, *iter;
+	children = gtk_container_get_children(GTK_CONTAINER(list_box));
+	for (iter = children; iter != NULL; iter = g_list_next(iter)) {
+		gtk_widget_destroy(GTK_WIDGET(iter->data));
+	}
+	g_list_free(children);
+	
+	/* TEST */
+	int result_count = get_result_count();
+	printf("Result count updated: %d  \n", result_count);
 
-    // Add each password to the list box
-    for (int i = 0; i < result_count; i++) {
-        GtkWidget *password_box = create_password_box(&passwords[i]);
-        gtk_container_add(GTK_CONTAINER(list_box), password_box);
-        gtk_widget_show_all(password_box);
-    }
+	/* Centering box to hold the header row and password boxes */
+	GtkWidget *centering_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_widget_set_halign(centering_box, GTK_ALIGN_CENTER);
 
-    // Free the memory allocated for the passwords
-    for (int i = 0; i < result_count; i++) {
-        free(passwords[i].username);
-        free(passwords[i].email);
-        free(passwords[i].service_name);
-        free(passwords[i].service_link);
-        free(passwords[i].password);
-        free(passwords[i].creation_date);
-        free(passwords[i].update_date);
-    }
-    free(passwords);
+	GtkWidget *header_row = create_header_row();
+	gtk_box_pack_start(GTK_BOX(centering_box), header_row, FALSE, FALSE, 0);
+
+	for (int i = 0; i < result_count; i++) {
+	GtkWidget *password_box = create_password_box(&passwords[i]);
+	gtk_box_pack_start(GTK_BOX(centering_box), password_box, FALSE, FALSE, 0);
+	}
+
+	/* Insert the centering box into the list box */
+	gtk_container_add(GTK_CONTAINER(list_box), centering_box);
+
+	/* Show all widgets after update */
+	gtk_widget_show_all(list_box);
+
+	/* Free the memory allocated for the passwords */
+	for (int i = 0; i < result_count; i++) {
+	free(passwords[i].username);
+	free(passwords[i].email);
+	free(passwords[i].service_name);
+	free(passwords[i].service_link);
+	free(passwords[i].password);
+	free(passwords[i].creation_date);
+	free(passwords[i].update_date);
+	}
+	free(passwords);
 }
 
-
-/* Function to create a box widget for the header row */
-GtkWidget *create_header_row() {
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-
-    GtkWidget *username_label = gtk_label_new("Username");
-    GtkWidget *email_label = gtk_label_new("Email");
-    GtkWidget *service_label = gtk_label_new("Service Name");
-    GtkWidget *link_label = gtk_label_new("Service Link");
-
-    gtk_box_pack_start(GTK_BOX(box), username_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), email_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), service_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), link_label, FALSE, FALSE, 0);
-
-    return box;
-}
-
-/* Function to create and add the header row to the list box */
-void add_header_row(GtkWidget *list_box) {
-    GtkWidget *header_row = create_header_row();
-    gtk_list_box_insert(GTK_LIST_BOX(list_box), header_row, -1);
-}
-
-/* Function to create a box widget for displaying a password */
-GtkWidget *create_password_box(const PasswordInfo *password) {
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-
-    GtkWidget *username_label = gtk_label_new(password->username);
-    GtkWidget *email_label = gtk_label_new(password->email);
-    GtkWidget *service_label = gtk_label_new(password->service_name);
-    GtkWidget *link_label = gtk_label_new(password->service_link);
-
-    gtk_box_pack_start(GTK_BOX(box), username_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), email_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), service_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), link_label, FALSE, FALSE, 0);
-
-    return box;
-}
 
 
 /* Function to populate the list box with passwords */
 void populate_passwords_list(GtkWidget *list_box) {
-    // Fetch all passwords from the database
-    PasswordInfo *passwords = fetch_all_passwords();
+    // Call the update_and_populate_passwords_list function
+    update_and_populate_passwords_list(list_box);
+}
 
-    // Clear existing rows in the list box
-    GList *children, *iter;
-    children = gtk_container_get_children(GTK_CONTAINER(list_box));
-    for (iter = children; iter != NULL; iter = g_list_next(iter)) {
-        gtk_widget_destroy(GTK_WIDGET(iter->data));
-    }
-    g_list_free(children);
+
+
+/* Function to create a box widget for the header row */
+GtkWidget *create_header_row() {
+    GtkWidget *grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+
+    GtkWidget *username_label = gtk_label_new("Username");
+    GtkWidget *email_label = gtk_label_new("Email");
+    GtkWidget *service_label = gtk_label_new("Service Name");
+    GtkWidget *password_label = gtk_label_new("Password");
+    GtkWidget *update_label = gtk_label_new("Last Update");
+
+    /* Define a fixed width for labels */
+    const int username_label_width = 150;
+    const int email_label_width = 225;
+    const int service_label_width = 150;
+    const int password_label_width = 150;
+    const int update_label_width = 150;
+
+    /* Set properties */
+    gtk_widget_set_hexpand(username_label, FALSE);
+    gtk_widget_set_size_request(username_label, username_label_width, -1);
+    gtk_label_set_xalign(GTK_LABEL(username_label), 0.0);
+
+    gtk_widget_set_hexpand(email_label, FALSE);
+    gtk_widget_set_size_request(email_label, email_label_width, -1);
+    gtk_label_set_xalign(GTK_LABEL(email_label), 0.0);
+
+    gtk_widget_set_hexpand(service_label, FALSE);
+    gtk_widget_set_size_request(service_label, service_label_width, -1);
+    gtk_label_set_xalign(GTK_LABEL(service_label), 0.0);
+
+    gtk_widget_set_hexpand(password_label, FALSE);
+    gtk_widget_set_size_request(password_label, password_label_width, -1);
+    gtk_label_set_xalign(GTK_LABEL(password_label), 0.0);
     
-    int result_count = get_result_count();
-    
-    // Add the header row to the list box
-    add_header_row(list_box);
+    gtk_widget_set_hexpand(update_label, FALSE);
+    gtk_widget_set_size_request(update_label, update_label_width, -1);
+    gtk_label_set_xalign(GTK_LABEL(update_label), 0.0);
 
-    // Add each password to the list box
-    for (int i = 0; i < result_count; i++) { // Use result_count instead of num_passwords
-        GtkWidget *password_box = create_password_box(&passwords[i]);
-        gtk_list_box_insert(GTK_LIST_BOX(list_box), password_box, -1);
-    }
+    /* Attach to the grid */
+    gtk_grid_attach(GTK_GRID(grid), username_label, 0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), email_label, 1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), service_label, 2, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), password_label, 3, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), update_label, 4, 0, 1, 1);
 
-    // Free the memory allocated for the passwords
-    for (int i = 0; i < result_count; i++) {
-        free(passwords[i].username);
-        free(passwords[i].email);
-        free(passwords[i].service_name);
-        free(passwords[i].service_link);
-        free(passwords[i].password);
-        free(passwords[i].creation_date);
-        free(passwords[i].update_date);
-    }
-    free(passwords);
+
+    return grid;
+}
+
+/* Function to create and add the header row to the list box */
+void add_header_row(GtkWidget *list_box) {
+	GtkWidget *header_row = create_header_row();
+	gtk_list_box_insert(GTK_LIST_BOX(list_box), header_row, -1);
+}
+
+/* Function to create a box widget for displaying a password */
+GtkWidget *create_password_box(const PasswordInfo *password) {
+	GtkWidget *grid = gtk_grid_new();
+	gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+	gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+
+	/* Define a fixed width for labels */
+	const int username_label_width = 150;
+	const int email_label_width = 225;
+	const int service_label_width = 150;
+	const int password_label_width = 150;
+	const int update_label_width = 150;
+
+	GtkWidget *username_label = gtk_label_new(password->username);
+	GtkWidget *email_label = gtk_label_new(password->email);
+	GtkWidget *service_label = gtk_label_new(password->service_name);
+	GtkWidget *password_label = gtk_label_new(password->password);
+	GtkWidget *update_label = gtk_label_new(password->update_date);
+
+	// Set properties to make each label take a fixed width
+	gtk_widget_set_hexpand(username_label, FALSE);
+	gtk_widget_set_size_request(username_label, username_label_width, -1);
+	gtk_label_set_xalign(GTK_LABEL(username_label), 0.0); // Align text to the left
+
+	gtk_widget_set_hexpand(email_label, FALSE);
+	gtk_widget_set_size_request(email_label, email_label_width, -1);
+	gtk_label_set_xalign(GTK_LABEL(email_label), 0.0); // Align text to the left
+
+	gtk_widget_set_hexpand(service_label, FALSE);
+	gtk_widget_set_size_request(service_label, service_label_width, -1);
+	gtk_label_set_xalign(GTK_LABEL(service_label), 0.0); // Align text to the left
+
+	gtk_widget_set_hexpand(password_label, FALSE);
+	gtk_widget_set_size_request(password_label, password_label_width, -1);
+	gtk_label_set_xalign(GTK_LABEL(password_label), 0.0); // Align text to the left
+
+	gtk_widget_set_hexpand(update_label, FALSE);
+	gtk_widget_set_size_request(update_label, update_label_width, -1);
+	gtk_label_set_xalign(GTK_LABEL(update_label), 0.0); // Align text to the left
+
+	// Attach labels to the grid
+	gtk_grid_attach(GTK_GRID(grid), username_label, 0, 0, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), email_label, 1, 0, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), service_label, 2, 0, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), password_label, 3, 0, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), update_label, 4, 0, 1, 1);
+
+	return grid;
 }
 
 
@@ -168,6 +222,7 @@ void mainwindow_init(GtkWidget *stack) {
 
  		
 	GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    	gtk_container_set_border_width(GTK_CONTAINER(main_box), 50);
 	
 	/* Add the search box at the top */
 	GtkWidget *search_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -202,8 +257,6 @@ void mainwindow_init(GtkWidget *stack) {
 	
 	gtk_box_pack_start(GTK_BOX(main_box), add_password_button, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(main_box), logout_button, FALSE, FALSE, 0);
-
-	
 
 	gtk_stack_add_titled(GTK_STACK(stack), main_box, "main", "Main Page");
 }

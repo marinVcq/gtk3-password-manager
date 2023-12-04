@@ -2,13 +2,18 @@
 
 ## TODO
 
+- Hide password in GUI
+- Edit & Delete function
 - Header row issue when user add pasword
 - Make list box scrollable
 - Encrypt user password and password records
 - Export Feature
 - Sorting feature
 - Back button on create account page
-- Design List Box
+- Design List Box ( increase header's font)
+- Add Preference (color, font-size etc ..)
+- Add Dumb Values
+
 
 ## Introduction
 

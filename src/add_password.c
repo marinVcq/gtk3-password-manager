@@ -38,7 +38,7 @@ void on_add_password_button_clicked(GtkButton *button, gpointer data)
 		g_print("Add password to database\n");
 		
 		// Update the password list
-		update_passwords_list(main_page.list_box);
+		update_and_populate_passwords_list(main_page.list_box);
 		
 
 		/* Go to main page & clear error message */

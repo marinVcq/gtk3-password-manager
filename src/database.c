@@ -19,6 +19,11 @@ int initialize_database() {
     return rc;
 }
 
+/* Fetch all passwords sorted by service name */
+PasswordInfo *fetch_all_passwords_filtered(const char *filter){
+	/* Not implemented Yet */
+}
+
 /* Function to fetch passwords from the database */
 PasswordInfo *fetch_all_passwords() {
     sqlite3 *db;
