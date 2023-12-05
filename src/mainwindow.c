@@ -112,6 +112,13 @@ GtkWidget *create_header_row() {
     const int service_label_width = 150;
     const int password_label_width = 150;
     const int update_label_width = 150;
+    
+    /* Assign unique IDs to the labels */
+    gtk_widget_set_name(username_label, "username_label");
+    gtk_widget_set_name(email_label, "email_label");
+    gtk_widget_set_name(service_label, "service_label");
+    gtk_widget_set_name(password_label, "password_label");
+    gtk_widget_set_name(update_label, "update_label");
 
     /* Set properties */
     gtk_widget_set_hexpand(username_label, FALSE);
@@ -133,6 +140,10 @@ GtkWidget *create_header_row() {
     gtk_widget_set_hexpand(update_label, FALSE);
     gtk_widget_set_size_request(update_label, update_label_width, -1);
     gtk_label_set_xalign(GTK_LABEL(update_label), 0.0);
+    
+    /* Set padding for the header row */
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 5); // Adjust the padding as needed
+
 
     /* Attach to the grid */
     gtk_grid_attach(GTK_GRID(grid), username_label, 0, 0, 1, 1);
@@ -197,6 +208,11 @@ GtkWidget *create_password_box(const PasswordInfo *password) {
 	gtk_grid_attach(GTK_GRID(grid), service_label, 2, 0, 1, 1);
 	gtk_grid_attach(GTK_GRID(grid), password_label, 3, 0, 1, 1);
 	gtk_grid_attach(GTK_GRID(grid), update_label, 4, 0, 1, 1);
+	
+	
+	/* Set padding for the password box */
+	gtk_container_set_border_width(GTK_CONTAINER(grid), 5); // Adjust the padding as needed
+
 
 	return grid;
 }
@@ -213,16 +229,28 @@ void mainwindow_init(GtkWidget *stack) {
 	/* Init the MainPage structure */
 	main_page.stack = stack;
 	main_page.list_box = gtk_list_box_new();
+
 	
 	/* Encapsulate the list box inside a scrolled window */
 	GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolled_window), 300);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), main_page.list_box);
+	
+	/* Set padding for the scrolled window */
+	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 10); // Adjust the padding as needed
+
 
  		
 	GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     	gtk_container_set_border_width(GTK_CONTAINER(main_box), 50);
+    	
+    	/* Load and apply CSS */
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_path(cssProvider, "../style.css", NULL);
+	GtkStyleContext *styleContext = gtk_widget_get_style_context(main_box);
+	gtk_style_context_add_provider(styleContext, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+
 	
 	/* Add the search box at the top */
 	GtkWidget *search_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -241,7 +269,11 @@ void mainwindow_init(GtkWidget *stack) {
 	g_signal_connect(export_button, "clicked", G_CALLBACK(on_export_button_clicked), NULL);
 	
 	/* Populate the list box with passwords */
-    	populate_passwords_list(main_page.list_box);
+	if (auth_context.user_id != 0) {
+		populate_passwords_list(main_page.list_box);
+	} else {
+		printf("User not authenticated\n");
+	}
 	
 	GtkWidget *logout_button = gtk_button_new_with_label("Logout");
 	GtkWidget *add_password_button = gtk_button_new_with_label("Add password");
@@ -255,8 +287,18 @@ void mainwindow_init(GtkWidget *stack) {
 	gtk_box_pack_start(GTK_BOX(main_box), search_box, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(main_box), scrolled_window, TRUE, TRUE, 0);
 	
-	gtk_box_pack_start(GTK_BOX(main_box), add_password_button, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(main_box), logout_button, FALSE, FALSE, 0);
+	/* Create a box for "Logout" and "Add Password" buttons */
+	GtkWidget *logout_add_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+	gtk_box_pack_end(GTK_BOX(logout_add_box), add_password_button, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(logout_add_box), logout_button, FALSE, FALSE, 0);
+	
+	/* Pack the "Logout" and "Add Password" box at the end of main_box */
+	gtk_box_pack_end(GTK_BOX(main_box), logout_add_box, FALSE, FALSE, 0);
+
+
+	
+/*	gtk_box_pack_start(GTK_BOX(main_box), add_password_button, FALSE, FALSE, 0);*/
+/*	gtk_box_pack_start(GTK_BOX(main_box), logout_button, FALSE, FALSE, 0);*/
 
 	gtk_stack_add_titled(GTK_STACK(stack), main_box, "main", "Main Page");
 }

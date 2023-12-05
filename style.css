@@ -1,0 +1,12 @@
+/* style.css */
+
+/* Increase font size for header row labels */
+#username_label,
+#email_label,
+#service_label,
+#password_label,
+#update_label {
+    font-size: 24px; /* Adjust the font size as needed */
+    font-weight: bold;
+}
+

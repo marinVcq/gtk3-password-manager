@@ -2,6 +2,7 @@
 
 ## TODO
 
+- Add Auth context
 - Hide password in GUI
 - Edit & Delete function
 - Header row issue when user add pasword

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "../include/database.h"
 #include "../include/login.h"
+#include "../include/auth_context.h"
 
 /* Declare instance of login page */
 LoginPage login_page;
@@ -19,6 +20,12 @@ void on_login_button_clicked(GtkButton *button, gpointer data) {
     if (check_user(username)) {
         /* Check if the password is correct */
         if (check_password(username, password)) {
+        
+            /* Set authentication context */
+            auth_context.user_id = get_user_id(username);  // Implement this function in database.c
+            auth_context.username = strdup(username);
+            auth_context.email = get_user_email(username);  // Implement this function in database.c
+
 	    /* display correct child if success & clear error message */
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
             gtk_label_set_text(GTK_LABEL(error_label), "");
