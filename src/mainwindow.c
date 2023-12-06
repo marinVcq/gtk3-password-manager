@@ -6,10 +6,23 @@
 
 MainPage main_page;
 
+void restart_application() {
+    // Get the current executable path
+    char executable_path[1024];
+    ssize_t len = readlink("/proc/self/exe", executable_path, sizeof(executable_path) - 1);
+    if (len != -1) {
+        executable_path[len] = '\0';
+
+        // Execute the application with the same arguments
+        execl(executable_path, executable_path, (char *)NULL);
+    } else {
+        fprintf(stderr, "Error getting executable path\n");
+    }
+}
+
 /* Callback function: Handle logout button click */
 void on_logout_button_clicked(GtkButton *button, gpointer data) {
-	GtkWidget *stack = main_page.stack;
-	gtk_stack_set_visible_child_name(GTK_STACK(stack), "login");
+	 restart_application();
 }
 
 /* Function to set the user ID in the MainPage structure */

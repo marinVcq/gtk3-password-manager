@@ -27,6 +27,7 @@ GtkWidget *create_password_box(const PasswordInfo *password);
 void add_header_row(GtkWidget *list_box);
 void update_and_populate_passwords_list(GtkWidget *list_box, int user_id);
 void set_user_id(int user_id);
+void restart_application();
 
 
 #endif // MAINWINDOW_H
