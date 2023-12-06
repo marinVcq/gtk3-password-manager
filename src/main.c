@@ -5,10 +5,6 @@
 #include "../include/login.h"
 #include "../include/mainwindow.h"
 #include "../include/add_password.h"
-#include "./include/auth_context.h"
-
-/* Auth state */
-AuthContext auth_context;
 
 int main(int argc, char *argv[]) {
 

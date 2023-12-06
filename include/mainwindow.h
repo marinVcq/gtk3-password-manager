@@ -11,6 +11,7 @@ typedef struct {
 	GtkWidget *list_box;
 	GtkWidget *search_entry;
 	PasswordInfo *passwords;
+	int user_id;
 } MainPage;
 
 extern MainPage main_page;
@@ -25,6 +26,7 @@ void populate_passwords_list(GtkWidget *list_box);
 GtkWidget *create_password_box(const PasswordInfo *password);
 void add_header_row(GtkWidget *list_box);
 void update_and_populate_passwords_list(GtkWidget *list_box);
+void set_user_id(int user_id);
 
 
 #endif // MAINWINDOW_H

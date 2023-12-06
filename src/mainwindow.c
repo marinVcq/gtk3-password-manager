@@ -12,6 +12,11 @@ void on_logout_button_clicked(GtkButton *button, gpointer data) {
 	gtk_stack_set_visible_child_name(GTK_STACK(stack), "login");
 }
 
+/* Function to set the user ID in the MainPage structure */
+void set_user_id(int user_id) {
+    main_page.user_id = user_id;
+}
+
 /* Callback function: Handle add password button click */
 void on_add_button_clicked(GtkButton *button, gpointer data) {
 	GtkWidget *stack = main_page.stack;
@@ -28,7 +33,7 @@ void on_export_button_clicked(GtkButton *button, gpointer data) {
 	/* Not implemented yet */ 
 }
 
-/* Function to update and populate the list box with passwords */
+/* Function to update and populate the lisat box with passwords */
 void update_and_populate_passwords_list(GtkWidget *list_box) {
 	
 	/* Fetch paswords from database */
@@ -229,8 +234,8 @@ void mainwindow_init(GtkWidget *stack) {
 	/* Init the MainPage structure */
 	main_page.stack = stack;
 	main_page.list_box = gtk_list_box_new();
+	main_page.user_id = -1;
 
-	
 	/* Encapsulate the list box inside a scrolled window */
 	GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -247,7 +252,7 @@ void mainwindow_init(GtkWidget *stack) {
     	
     	/* Load and apply CSS */
 	GtkCssProvider *cssProvider = gtk_css_provider_new();
-	gtk_css_provider_load_from_path(cssProvider, "../style.css", NULL);
+	gtk_css_provider_load_from_path(cssProvider, "./style.css", NULL);
 	GtkStyleContext *styleContext = gtk_widget_get_style_context(main_box);
 	gtk_style_context_add_provider(styleContext, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
@@ -269,11 +274,13 @@ void mainwindow_init(GtkWidget *stack) {
 	g_signal_connect(export_button, "clicked", G_CALLBACK(on_export_button_clicked), NULL);
 	
 	/* Populate the list box with passwords */
-	if (auth_context.user_id != 0) {
+	if(main_page.user_id != -1){
 		populate_passwords_list(main_page.list_box);
-	} else {
+	}else{
 		printf("User not authenticated\n");
 	}
+
+
 	
 	GtkWidget *logout_button = gtk_button_new_with_label("Logout");
 	GtkWidget *add_password_button = gtk_button_new_with_label("Add password");

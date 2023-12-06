@@ -19,6 +19,50 @@ int initialize_database() {
     return rc;
 }
 
+/* Function to get user ID by username */
+int get_user_id(const char *username) {
+	sqlite3 *db;
+	int rc = sqlite3_open(DATABASE_NAME, &db);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return -1;
+	}
+
+	const char *get_user_id_sql = "SELECT user_id FROM users WHERE username = ? LIMIT 1;";
+	sqlite3_stmt *stmt;
+
+	rc = sqlite3_prepare_v2(db, get_user_id_sql, -1, &stmt, 0);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error (prepare statement): %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		return -1;
+	}
+
+	/* Bind parameters */
+	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+	/* Execute statement */
+	rc = sqlite3_step(stmt);
+
+	int user_id = -1;
+
+	if (rc == SQLITE_ROW) {
+		user_id = sqlite3_column_int(stmt, 0);
+	}
+
+	/* Finalize the statement and close the database */
+	sqlite3_finalize(stmt);
+	sqlite3_close(db);
+	
+	printf("the user id: %d \n", user_id);
+
+	return user_id;
+}
+
+
 /* Fetch all passwords sorted by service name */
 PasswordInfo *fetch_all_passwords_filtered(const char *filter){
 	/* Not implemented Yet */
