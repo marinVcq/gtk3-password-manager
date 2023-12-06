@@ -19,6 +19,8 @@ void on_add_password_button_clicked(GtkButton *button, gpointer data)
 	GtkWidget *stack = add_password_page.stack;
 	GtkWidget *error_label = add_password_page.error_label;
 	
+	printf("user_id fetched from add_password function: %d", main_page.user_id);
+	
 	/* Perform a basic form validation */
 	if(strlen(username) == 0 ||strlen(email) == 0||strlen(password) == 0||strlen(password_check) == 0){
 		gtk_label_set_text(GTK_LABEL(error_label), "All fields must be filled");
@@ -32,13 +34,13 @@ void on_add_password_button_clicked(GtkButton *button, gpointer data)
 	}
 	
 	/* Insert password */
-	if (insert_password(username, email, password, service_name, service_link)) {
+	if (insert_password(username, email, password, service_name, service_link, main_page.user_id)) {
 		
 		/* Handle success */ 
 		g_print("Add password to database\n");
 		
 		// Update the password list
-		update_and_populate_passwords_list(main_page.list_box);
+		update_and_populate_passwords_list(main_page.list_box, main_page.user_id);
 		
 
 		/* Go to main page & clear error message */

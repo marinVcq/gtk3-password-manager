@@ -68,8 +68,11 @@ PasswordInfo *fetch_all_passwords_filtered(const char *filter){
 	/* Not implemented Yet */
 }
 
-/* Function to fetch passwords from the database */
-PasswordInfo *fetch_all_passwords() {
+/* Function to fetch passwords from the database based on user_id */
+PasswordInfo *fetch_all_passwords(int user_id) {
+
+	/* TEST */
+    printf("fetch_all_passwords called\n");
     sqlite3 *db;
     int rc = sqlite3_open(DATABASE_NAME, &db);
 
@@ -79,7 +82,7 @@ PasswordInfo *fetch_all_passwords() {
         return NULL;
     }
 
-    const char *fetch_passwords_sql = "SELECT * FROM passwords;";
+    const char *fetch_passwords_sql = "SELECT * FROM passwords WHERE user_id = ?;";
     sqlite3_stmt *stmt;
 
     rc = sqlite3_prepare_v2(db, fetch_passwords_sql, -1, &stmt, 0);
@@ -89,6 +92,9 @@ PasswordInfo *fetch_all_passwords() {
         sqlite3_close(db);
         return NULL;
     }
+
+    // Bind the user_id parameter
+    sqlite3_bind_int(stmt, 1, user_id);
 
     int result_count = 0;
     PasswordInfo *passwords = NULL;
@@ -111,12 +117,14 @@ PasswordInfo *fetch_all_passwords() {
     /* Finalize statement and close database */
     sqlite3_finalize(stmt);
     sqlite3_close(db);
+    printf("end fetch_all_passwords\n");
 
     return passwords;
 }
 
-/* Function to get the result count */
-int get_result_count() {
+
+/* Function to get the result count based on user_id */
+int get_result_count(int user_id) {
     int result_count = 0;
     sqlite3 *db;
     int rc = sqlite3_open(DATABASE_NAME, &db);
@@ -127,7 +135,7 @@ int get_result_count() {
         return result_count;
     }
 
-    const char *count_passwords_sql = "SELECT COUNT(*) FROM passwords;";
+    const char *count_passwords_sql = "SELECT COUNT(*) FROM passwords WHERE user_id = ?;";
     sqlite3_stmt *stmt;
 
     rc = sqlite3_prepare_v2(db, count_passwords_sql, -1, &stmt, 0);
@@ -137,6 +145,9 @@ int get_result_count() {
         sqlite3_close(db);
         return result_count;
     }
+
+    // Bind the user_id parameter
+    sqlite3_bind_int(stmt, 1, user_id);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         result_count = sqlite3_column_int(stmt, 0);
@@ -149,9 +160,10 @@ int get_result_count() {
     return result_count;
 }
 
+
 /* Function to insert password in the database */
 bool insert_password(const char *username, const char *email, const char *password,
-                     const char *service_name, const char *service_link) {
+                     const char *service_name, const char *service_link, int user_id) {
     sqlite3 *db;
     int rc = sqlite3_open(DATABASE_NAME, &db);
 
@@ -161,7 +173,7 @@ bool insert_password(const char *username, const char *email, const char *passwo
         return false;
     }
 
-    const char *insert_password_sql = "INSERT INTO passwords (username, email, service_name, service_link, password, creation_date, update_date, user_id) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, (SELECT user_id FROM users WHERE username = ?));";
+    const char *insert_password_sql = "INSERT INTO passwords (username, email, service_name, service_link, password, creation_date, update_date, user_id) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);";
     sqlite3_stmt *stmt;
 
     rc = sqlite3_prepare_v2(db, insert_password_sql, -1, &stmt, 0);
@@ -172,14 +184,17 @@ bool insert_password(const char *username, const char *email, const char *passwo
         return false;
     }
 
+    /* Convert user_id to string */
+    char user_id_str[12];  // Assuming a reasonable maximum length for an integer
+    snprintf(user_id_str, sizeof(user_id_str), "%d", user_id);
+
     /* Bind parameters */
     sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, email, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, service_name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, service_link, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, password, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 6, username, -1, SQLITE_STATIC);
-
+    sqlite3_bind_text(stmt, 6, user_id_str, -1, SQLITE_STATIC);  // Convert to string
     /* execute the statement */
     rc = sqlite3_step(stmt);
 
@@ -195,6 +210,7 @@ bool insert_password(const char *username, const char *email, const char *passwo
 
     return true;
 }
+
 
 /* Function to insert new user in database */
 bool insert_user(const char *username, const char *email, const char *password) {

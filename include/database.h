@@ -30,9 +30,9 @@ bool check_user(const char *username);
 bool check_password(const char *username, const char *password);
 bool insert_user(const char *username, const char *email, const char *password);
 bool insert_password(const char *username, const char *email, const char *password,
-                     const char *service_name, const char *service_link);
-PasswordInfo *fetch_all_passwords();
-int get_result_count();
+                     const char *service_name, const char *service_link, int user_id);
+PasswordInfo *fetch_all_passwords(int user_id);
+int get_result_count(int user_id);
 PasswordInfo *fetch_all_passwords_filtered(const char *filter);
 
 

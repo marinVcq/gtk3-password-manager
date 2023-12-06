@@ -34,10 +34,10 @@ void on_export_button_clicked(GtkButton *button, gpointer data) {
 }
 
 /* Function to update and populate the lisat box with passwords */
-void update_and_populate_passwords_list(GtkWidget *list_box) {
+void update_and_populate_passwords_list(GtkWidget *list_box, int user_id) {
 	
 	/* Fetch paswords from database */
-	PasswordInfo *passwords = fetch_all_passwords();
+	PasswordInfo *passwords = fetch_all_passwords(user_id);
 
 	if (passwords == NULL) {
 	fprintf(stderr, "Error fetching passwords from the database.\n");
@@ -55,7 +55,7 @@ void update_and_populate_passwords_list(GtkWidget *list_box) {
 	g_list_free(children);
 	
 	/* TEST */
-	int result_count = get_result_count();
+	int result_count = get_result_count(user_id);
 	printf("Result count updated: %d  \n", result_count);
 
 	/* Centering box to hold the header row and password boxes */
@@ -66,8 +66,8 @@ void update_and_populate_passwords_list(GtkWidget *list_box) {
 	gtk_box_pack_start(GTK_BOX(centering_box), header_row, FALSE, FALSE, 0);
 
 	for (int i = 0; i < result_count; i++) {
-	GtkWidget *password_box = create_password_box(&passwords[i]);
-	gtk_box_pack_start(GTK_BOX(centering_box), password_box, FALSE, FALSE, 0);
+		GtkWidget *password_box = create_password_box(&passwords[i]);
+		gtk_box_pack_start(GTK_BOX(centering_box), password_box, FALSE, FALSE, 0);
 	}
 
 	/* Insert the centering box into the list box */
@@ -87,6 +87,7 @@ void update_and_populate_passwords_list(GtkWidget *list_box) {
 	free(passwords[i].update_date);
 	}
 	free(passwords);
+	printf("end populate function\n");
 }
 
 
@@ -94,7 +95,7 @@ void update_and_populate_passwords_list(GtkWidget *list_box) {
 /* Function to populate the list box with passwords */
 void populate_passwords_list(GtkWidget *list_box) {
     // Call the update_and_populate_passwords_list function
-    update_and_populate_passwords_list(list_box);
+    update_and_populate_passwords_list(list_box, main_page.user_id);
 }
 
 

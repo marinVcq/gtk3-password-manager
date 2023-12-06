@@ -28,7 +28,7 @@ void on_login_button_clicked(GtkButton *button, gpointer data) {
 
 	    /* display correct child if success & clear error message */
 	    set_user_id(login_page.user_id);
-	    update_and_populate_passwords_list(main_page.list_box);
+	    update_and_populate_passwords_list(main_page.list_box, main_page.user_id);
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "main");
             gtk_label_set_text(GTK_LABEL(error_label), "");
         } else {
