@@ -33,7 +33,8 @@ bool insert_password(const char *username, const char *email, const char *passwo
                      const char *service_name, const char *service_link, int user_id);
 PasswordInfo *fetch_all_passwords(int user_id);
 int get_result_count(int user_id);
-PasswordInfo *fetch_all_passwords_filtered(const char *filter);
+PasswordInfo *fetch_all_passwords_filtered(int user_id, const char *filter);
+int get_result_count_filtered(int user_id, const char *filter);
 
 
 #endif // DATABASE_H

@@ -2,18 +2,18 @@
 
 ## TODO
 
-- Add Auth context
+- Add Auth context.........................................OK
 - Hide password in GUI
 - Edit & Delete function
 - Header row issue when user add pasword
-- Make list box scrollable
+- Make list box scrollable.................................OK
 - Encrypt user password and password records
 - Export Feature
-- Sorting feature
+- Sorting feature..........................................OK
 - Back button on create account page
 - Design List Box ( increase header's font)
 - Add Preference (color, font-size etc ..)
-- Add Dumb Values
+- Add Dumb Values..........................................OK
 
 
 ## Introduction

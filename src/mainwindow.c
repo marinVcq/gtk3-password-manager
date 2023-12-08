@@ -38,13 +38,71 @@ void on_add_button_clicked(GtkButton *button, gpointer data) {
 
 /* Callback function: Handle search button click */
 void on_search_button_clicked(GtkButton *button, gpointer data) {
-	/* Not implemented yet */ 
+	populate_passwords_list_filter_by(main_page.list_box);
 }
 
 /* Callback function: Handle export button click */
 void on_export_button_clicked(GtkButton *button, gpointer data) {
 	/* Not implemented yet */ 
 }
+
+/* Function to update and populate the lisat box with passwords but filtered  */
+void update_and_populate_passwords_list_filter_by(GtkWidget *list_box, int user_id, const char *filter) {
+	
+	/* Fetch paswords from database */
+	PasswordInfo *passwords = fetch_all_passwords_filtered(user_id, filter);
+
+	if (passwords == NULL) {
+	fprintf(stderr, "Error fetching passwords from the database.\n");
+	return;
+	}
+
+	printf("update and populate passwords function called\n");
+
+	/* Clear existing rows */
+	GList *children, *iter;
+	children = gtk_container_get_children(GTK_CONTAINER(list_box));
+	for (iter = children; iter != NULL; iter = g_list_next(iter)) {
+		gtk_widget_destroy(GTK_WIDGET(iter->data));
+	}
+	g_list_free(children);
+	
+	/* TEST */
+	int result_count = get_result_count_filtered(user_id, filter);
+	printf("Result count updated: %d  \n", result_count);
+
+	/* Centering box to hold the header row and password boxes */
+	GtkWidget *centering_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_widget_set_halign(centering_box, GTK_ALIGN_CENTER);
+
+	GtkWidget *header_row = create_header_row();
+	gtk_box_pack_start(GTK_BOX(centering_box), header_row, FALSE, FALSE, 0);
+
+	for (int i = 0; i < result_count; i++) {
+		GtkWidget *password_box = create_password_box(&passwords[i]);
+		gtk_box_pack_start(GTK_BOX(centering_box), password_box, FALSE, FALSE, 0);
+	}
+
+	/* Insert the centering box into the list box */
+	gtk_container_add(GTK_CONTAINER(list_box), centering_box);
+
+	/* Show all widgets after update */
+	gtk_widget_show_all(list_box);
+
+	/* Free the memory allocated for the passwords */
+	for (int i = 0; i < result_count; i++) {
+	free(passwords[i].username);
+	free(passwords[i].email);
+	free(passwords[i].service_name);
+	free(passwords[i].service_link);
+	free(passwords[i].password);
+	free(passwords[i].creation_date);
+	free(passwords[i].update_date);
+	}
+	free(passwords);
+	printf("end populate function\n");
+}
+
 
 /* Function to update and populate the lisat box with passwords */
 void update_and_populate_passwords_list(GtkWidget *list_box, int user_id) {
@@ -109,6 +167,13 @@ void update_and_populate_passwords_list(GtkWidget *list_box, int user_id) {
 void populate_passwords_list(GtkWidget *list_box) {
     // Call the update_and_populate_passwords_list function
     update_and_populate_passwords_list(list_box, main_page.user_id);
+}
+
+/* Function to populate the list box with passwords */
+void populate_passwords_list_filter_by(GtkWidget *list_box) {
+    // Call the update_and_populate_passwords_list function
+    const char *filter = gtk_entry_get_text(GTK_ENTRY(main_page.entry_search));
+    update_and_populate_passwords_list_filter_by(list_box, main_page.user_id, filter);
 }
 
 
@@ -274,13 +339,13 @@ void mainwindow_init(GtkWidget *stack) {
 	/* Add the search box at the top */
 	GtkWidget *search_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
 	GtkWidget *search_label = gtk_label_new("Service Name: ");
-	GtkWidget *search_entry = gtk_entry_new();
+	main_page.entry_search = gtk_entry_new();
 	GtkWidget *search_button = gtk_button_new_with_label("Search");
 	GtkWidget *export_button = gtk_button_new_with_label("Export");
 	
 	gtk_box_pack_end(GTK_BOX(search_box), export_button, FALSE, FALSE, 0);
 	gtk_box_pack_end(GTK_BOX(search_box), search_button, FALSE, FALSE, 0);
-	gtk_box_pack_end(GTK_BOX(search_box), search_entry, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(search_box), main_page.entry_search, FALSE, FALSE, 0);
 	gtk_box_pack_end(GTK_BOX(search_box), search_label, FALSE, FALSE, 0);
 
 	/* Connect the search and export button click signal to a callback function */

@@ -62,11 +62,96 @@ int get_user_id(const char *username) {
 	return user_id;
 }
 
+/* Function to get the result count based on user_id and filter */
+int get_result_count_filtered(int user_id, const char *filter) {
+    int result_count = 0;
+    sqlite3 *db;
+    int rc = sqlite3_open(DATABASE_NAME, &db);
 
-/* Fetch all passwords sorted by service name */
-PasswordInfo *fetch_all_passwords_filtered(const char *filter){
-	/* Not implemented Yet */
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return result_count;
+    }
+
+    const char *count_passwords_sql = "SELECT COUNT(*) FROM passwords WHERE user_id = ? AND service_name LIKE ?;";
+    sqlite3_stmt *stmt;
+
+    rc = sqlite3_prepare_v2(db, count_passwords_sql, -1, &stmt, 0);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error (prepare statement): %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return result_count;
+    }
+
+    // Bind the user_id and filter parameters
+    sqlite3_bind_int(stmt, 1, user_id);
+    sqlite3_bind_text(stmt, 2, filter, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        result_count = sqlite3_column_int(stmt, 0);
+    }
+
+    /* Finalize statement and close database */
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return result_count;
 }
+
+
+
+PasswordInfo *fetch_all_passwords_filtered(int user_id, const char *filter) {
+    sqlite3 *db;
+    int rc = sqlite3_open(DATABASE_NAME, &db);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return NULL;
+    }
+
+    const char *fetch_passwords_sql = "SELECT * FROM passwords WHERE user_id = ? AND service_name LIKE ?;";
+    sqlite3_stmt *stmt;
+
+    rc = sqlite3_prepare_v2(db, fetch_passwords_sql, -1, &stmt, 0);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error (prepare statement): %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return NULL;
+    }
+
+    // Bind parameters
+    sqlite3_bind_int(stmt, 1, user_id);
+    sqlite3_bind_text(stmt, 2, filter, -1, SQLITE_STATIC);
+
+    int result_count = 0;
+    PasswordInfo *passwords = NULL;
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        result_count++;
+        passwords = realloc(passwords, result_count * sizeof(PasswordInfo));
+
+        passwords[result_count - 1].password_id = sqlite3_column_int(stmt, 0);
+        passwords[result_count - 1].username = strdup((const char *)sqlite3_column_text(stmt, 1));
+        passwords[result_count - 1].email = strdup((const char *)sqlite3_column_text(stmt, 2));
+        passwords[result_count - 1].service_name = strdup((const char *)sqlite3_column_text(stmt, 3));
+        passwords[result_count - 1].service_link = strdup((const char *)sqlite3_column_text(stmt, 4));
+        passwords[result_count - 1].password = strdup((const char *)sqlite3_column_text(stmt, 5));
+        passwords[result_count - 1].creation_date = strdup((const char *)sqlite3_column_text(stmt, 6));
+        passwords[result_count - 1].update_date = strdup((const char *)sqlite3_column_text(stmt, 7));
+        passwords[result_count - 1].user_id = sqlite3_column_int(stmt, 8);
+    }
+
+    // Finalize statement and close database
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return passwords;
+}
+
 
 /* Function to fetch passwords from the database based on user_id */
 PasswordInfo *fetch_all_passwords(int user_id) {
